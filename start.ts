@@ -23,7 +23,7 @@ async function main() {
   const GS_SEED = randomBytes(32); // very secret!
   const GS_SEED_HASH = sha256(GS_SEED);
 
-  const VX_PUBKEY = await vx.make_pubkey(GS_SEED_HASH);
+  const VX_PUBKEY = await vx.make_commitment(GS_SEED_HASH);
 
   console.log(
     `Hey Player! We're ready to go with the following values: 

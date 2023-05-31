@@ -13,6 +13,7 @@ const connectionString =
 
 const pool = new pg.Pool({
   connectionString,
+  allowExitOnIdle: true,
 });
 
 export async function queryOne(query: string, params: any[]) {
@@ -21,8 +22,8 @@ export async function queryOne(query: string, params: any[]) {
   return rows[0];
 }
 
-export async function make_pubkey(gsSeedHash: Uint8Array) {
-  const row = await queryOne("SELECT * FROM make_pubkey($1)", [gsSeedHash]);
+export async function make_commitment(gsSeedHash: Uint8Array) {
+  const row = await queryOne("SELECT * FROM make_commitment($1)", [gsSeedHash]);
   return row.vx_pubkey as Uint8Array;
 }
 
