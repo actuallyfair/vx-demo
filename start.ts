@@ -13,6 +13,7 @@ import {
   getResultFairCoinToss,
 } from "verifier/dist/getOutcome";
 import { demoFairCoinToss_ChoiceToJSON } from "verifier/dist/wagers/demo_fair_coin_toss";
+import { Wager } from "verifier/dist/wagers";
 
 async function main() {
   console.log("Running vx demo...");
@@ -67,8 +68,11 @@ async function main() {
       GS_SEED,
       utf8ToBytes(`${clientSeed}:${nonce}`) // This is inside hmac, so we're not worried about anything like length extension attacks
     );
-    const wager: DemoFairCoinToss = {
+    const diceWager: DemoFairCoinToss = {
       playerChoice,
+    };
+    const wager: Wager = {
+      demoFairCoinToss: diceWager,
     };
 
     const VX_SIGNATURE = await make_wager(GS_SEED_HASH, GS_CONTRIBUTION, wager);
@@ -81,9 +85,9 @@ async function main() {
 
     const signatureHash = sha256(VX_SIGNATURE);
 
-    const outcome = getResultFairCoinToss(signatureHash, wager);
+    const outcome = getResultFairCoinToss(signatureHash, diceWager);
 
-    if (outcome == wager.playerChoice) {
+    if (outcome == diceWager.playerChoice) {
       balance++;
     } else {
       balance--;

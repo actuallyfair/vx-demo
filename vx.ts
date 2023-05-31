@@ -2,6 +2,7 @@ import * as pg from "pg";
 import { assert } from "tsafe";
 import { DemoFairCoinToss } from "verifier/dist/wagers/demo_fair_coin_toss";
 import { bytesToHex } from "@noble/hashes/utils";
+import { Wager } from "verifier/dist/wagers";
 
 // This really isn't a great example of how to use postgres. In reality want
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.
@@ -27,9 +28,9 @@ export async function make_pubkey(gsSeedHash: Uint8Array) {
 export async function make_wager(
   gsSeedHash: Uint8Array,
   gsContribution: Uint8Array,
-  wager: DemoFairCoinToss
+  wager: Wager
 ) {
-  const wagerBytes = DemoFairCoinToss.encode(wager).finish();
+  const wagerBytes = Wager.encode(wager).finish();
 
   const row = await queryOne("SELECT * FROM make_wager($1, $2, $3)", [
     gsSeedHash,
