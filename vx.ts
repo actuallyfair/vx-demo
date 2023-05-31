@@ -3,6 +3,7 @@ import { assert } from "tsafe";
 import { DemoFairCoinToss } from "verifier/dist/wagers/demo_fair_coin_toss";
 import { bytesToHex } from "@noble/hashes/utils";
 import { Wager } from "verifier/dist/wagers";
+import { Reveal } from "verifier/dist/reveals";
 
 // This really isn't a great example of how to use postgres. In reality want
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.
@@ -39,4 +40,18 @@ export async function make_wager(
   ]);
 
   return row.vx_signature as Uint8Array;
+}
+
+export async function make_reveal(
+  gsSeedHash: Uint8Array,
+  gsSeed: Uint8Array,
+  reveal: Reveal
+) {
+  const revealBytes = Reveal.encode(reveal).finish();
+
+  const row = await queryOne("SELECT * FROM make_reveal($1, $2, $3)", [
+    gsSeedHash,
+    gsSeed,
+    revealBytes,
+  ]);
 }
