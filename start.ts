@@ -6,12 +6,15 @@ import * as vx from "./vx";
 
 import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
-import { DemoFairCoinToss } from "verifier/dist/wagers/demo_fair_coin_toss";
-import { DemoFairCoinToss_Choice } from "verifier/dist/wagers/demo_fair_coin_toss";
-import { getResultFairCoinToss } from "verifier/dist/get-wager-outcome";
-import { demoFairCoinToss_ChoiceToJSON } from "verifier/dist/wagers/demo_fair_coin_toss";
+import {
+  DemoFairCoinToss,
+  DemoFairCoinToss_Choice,
+} from "verifier/dist/wagers/demo-fair-coin-toss";
+
 import { Wager } from "verifier/dist/wagers";
 import { Reveal } from "verifier/dist/reveals";
+
+import { getOutcomeFairCoinToss } from "verifier/dist/get-wager-outcome";
 
 async function main() {
   console.log("Running vx demo...");
@@ -85,9 +88,9 @@ async function main() {
     // This is actually pretty slow in js (but fine in native ), so you might want to verify in the background or in batches?
     const verified = bls.verify(VX_SIGNATURE, GS_CONTRIBUTION, VX_PUBKEY);
 
-    const outcome = getResultFairCoinToss(VX_SIGNATURE, diceWager);
+    const outcome = getOutcomeFairCoinToss(VX_SIGNATURE, diceWager);
 
-    if (outcome == diceWager.playerChoice) {
+    if (outcome.result.value == diceWager.playerChoice) {
       balance++;
     } else {
       balance--;
@@ -95,7 +98,7 @@ async function main() {
 
     console.log(
       "Outcome: ",
-      demoFairCoinToss_ChoiceToJSON(outcome),
+      outcome.result.displayName,
       " (verified =",
       verified,
       ") Your new balance is =",

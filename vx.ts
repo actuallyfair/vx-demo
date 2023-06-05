@@ -1,7 +1,5 @@
 import * as pg from "pg";
 import { assert } from "tsafe";
-import { DemoFairCoinToss } from "verifier/dist/wagers/demo_fair_coin_toss";
-import { bytesToHex } from "@noble/hashes/utils";
 import { Wager } from "verifier/dist/wagers";
 import { Reveal } from "verifier/dist/reveals";
 
