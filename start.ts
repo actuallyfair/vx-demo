@@ -8,10 +8,7 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import { DemoFairCoinToss } from "verifier/dist/wagers/demo_fair_coin_toss";
 import { DemoFairCoinToss_Choice } from "verifier/dist/wagers/demo_fair_coin_toss";
-import {
-  getOutcomeFairCoinToss,
-  getResultFairCoinToss,
-} from "verifier/dist/getOutcome";
+import { getResultFairCoinToss } from "verifier/dist/get-wager-outcome";
 import { demoFairCoinToss_ChoiceToJSON } from "verifier/dist/wagers/demo_fair_coin_toss";
 import { Wager } from "verifier/dist/wagers";
 import { Reveal } from "verifier/dist/reveals";

@@ -9,7 +9,7 @@ import { Reveal } from "verifier/dist/reveals";
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.
 
 const connectionString =
-  "postgres://logger:verysecurepassword@34.145.37.118:5432/postgres";
+  "postgres://logger:verysecurepassword@34.145.37.118:5432/vx";
 
 const pool = new pg.Pool({
   connectionString,
