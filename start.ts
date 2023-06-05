@@ -85,9 +85,7 @@ async function main() {
     // This is actually pretty slow in js (but fine in native ), so you might want to verify in the background or in batches?
     const verified = bls.verify(VX_SIGNATURE, GS_CONTRIBUTION, VX_PUBKEY);
 
-    const signatureHash = sha256(VX_SIGNATURE);
-
-    const outcome = getResultFairCoinToss(signatureHash, diceWager);
+    const outcome = getResultFairCoinToss(VX_SIGNATURE, diceWager);
 
     if (outcome == diceWager.playerChoice) {
       balance++;
