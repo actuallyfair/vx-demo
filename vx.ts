@@ -1,7 +1,6 @@
 import * as pg from "pg";
 import { assert } from "tsafe";
-import { Wager } from "verifier/dist/wagers";
-import { Reveal } from "verifier/dist/reveals";
+import { Wager, Reveal } from "verifier";
 
 // This really isn't a great example of how to use postgres. In reality want
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.

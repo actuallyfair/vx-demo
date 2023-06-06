@@ -9,10 +9,9 @@ import { stdin, stdout } from "node:process";
 import {
   DemoFairCoinToss,
   DemoFairCoinToss_Choice,
-} from "verifier/dist/wagers/demo-fair-coin-toss";
-
-import { Wager } from "verifier/dist/wagers";
-import { Reveal } from "verifier/dist/reveals";
+  Wager,
+  Reveal,
+} from "verifier";
 
 import { getOutcomeFairCoinToss } from "verifier/dist/get-wager-outcome";
 
