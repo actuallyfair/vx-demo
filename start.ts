@@ -97,7 +97,7 @@ async function main() {
 
     console.log(
       "Outcome: ",
-      outcome.result.displayName,
+      outcome.displayName,
       " (verified =",
       verified,
       ") Your new balance is =",

@@ -17,6 +17,14 @@ export async function queryOne(query: string, params: any[]) {
   const { rows } = await pool.query(query, params);
   assert(rows.length === 1);
   return rows[0];
+
+  // Or doing it per client would be
+  // const client = new pg.Client(connectionString);
+  // await client.connect();
+  // const { rows } = await client.query(query, params);
+  // assert(rows.length === 1);
+  // client.end();
+  // return rows[0];
 }
 
 export async function make_commitment(gsSeedHash: Uint8Array) {
@@ -29,13 +37,15 @@ export async function make_wager(
   gsContribution: Uint8Array,
   wager: Wager
 ) {
-  const wagerBytes = Wager.encode(wager).finish();
-
-  const row = await queryOne("SELECT * FROM make_wager($1, $2, $3)", [
-    gsSeedHash,
-    gsContribution,
-    wagerBytes,
-  ]);
+  // So there's two options. We need wager converted to bytes. Since we have protocolbuffers
+  // lib we could simply do: Wager.encode(wager).finish();
+  // That would be the recommended way, as it'd be easier to debug. But in case you don't have protobuff library,
+  // or don't want to install it  you could also just use json and do it
+  // from inside the db with encode_wager, which we will show
+  const row = await queryOne(
+    "SELECT * FROM make_wager($1, $2, encode_wager($3));",
+    [gsSeedHash, gsContribution, wager]
+  );
 
   return row.vx_signature as Uint8Array;
 }
