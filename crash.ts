@@ -1,5 +1,6 @@
 import { bytesToHex, randomBytes, utf8ToBytes } from "@noble/hashes/utils";
 import { sha256 } from "@noble/hashes/sha256";
+import { hmac } from "@noble/hashes/hmac";
 import { bls12_381 as bls } from "@noble/curves/bls12-381";
 import * as vx from "./vx";
 
@@ -21,7 +22,7 @@ async function main() {
   }
   hashChain.reverse();
 
-  const GS_SEED_HASH = hashChain.pop();
+  const GS_SEED_HASH = hashChain[0];
   assert(GS_SEED_HASH !== undefined);
   console.log(
     "Our hash chain has been established. The terminating hash is: ",
@@ -37,10 +38,8 @@ async function main() {
   );
 
   let gameId = 0;
-  while (hashChain.length > 0) {
+  while (hashChain.length > 1) {
     gameId++;
-    const hash = hashChain.pop();
-    assert(hash !== undefined);
 
     const wager: Wager = {
       vhempCrash: {
@@ -48,15 +47,19 @@ async function main() {
       },
     };
 
-    const vxSignature = await vx.make_wager(GS_SEED_HASH, hash, wager);
+    const vxSignature = await vx.make_wager(GS_SEED_HASH, hashChain[0], wager);
 
-    const verified = bls.verify(vxSignature, hash, VX_PUBKEY);
+    const verified = bls.verify(vxSignature, hashChain[0], VX_PUBKEY);
 
-    // Now we need to derive a result from the vxSignature. Doing it
+    const hash = hashChain.pop();
+    assert(hash !== undefined);
+
+    const outcomeBytes = hmac(sha256, vxSignature, hash);
+
+    // Now we need to derive a result from the outcomeBytes. Doing it
     // in a bustabit style would be something like:
-    const vxSignatureHash = sha256(vxSignature);
     const nBits = 52;
-    const n = bytesToHex(vxSignatureHash).slice(0, nBits / 4);
+    const n = bytesToHex(outcomeBytes).slice(0, nBits / 4);
     const r = Number.parseInt(n, 16);
     const X = r / 2 ** nBits; // uniform distribution between 0 and 1
 

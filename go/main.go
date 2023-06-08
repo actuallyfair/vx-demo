@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -40,7 +41,7 @@ func main() {
 	}
 	// Wow go. You're so cool. Glad there isn't a generic .reverse() method.
 
-	GS_SEED_HASH, hashChain := hashChain[0], hashChain[1:]
+	GS_SEED_HASH := hashChain[0]
 
 	fmt.Println("The terminating hash (GS_SEED_HASH) is: ", hex.EncodeToString(GS_SEED_HASH))
 
@@ -56,14 +57,12 @@ func main() {
 	/// Ok ... now this process is done per bet
 
 	gameId := 0
-	for len(hashChain) > 0 {
+	for len(hashChain) > 1 {
 		gameId = gameId + 1
-		var hash []byte
-		hash, hashChain = hashChain[0], hashChain[1:]
 
-		vxSignature := vx_make_wager(pool, GS_SEED_HASH, hash, gameId)
+		vxSignature := vx_make_wager(pool, GS_SEED_HASH, hashChain[0], gameId)
 
-		verified, err := VerifySignature(vxSignature, hash, vxPubKey)
+		verified, err := VerifySignature(vxSignature, hashChain[0], vxPubKey)
 		if err != nil {
 			panic(err)
 		}
@@ -71,7 +70,12 @@ func main() {
 			panic("wtf vx signature is not verified!")
 		}
 
-		seed := sha256.Sum256(vxSignature)
+		hmacHash := hmac.New(sha256.New, hashChain[0])
+		_, err = hmacHash.Write(hashChain[1])
+		if err != nil {
+			panic("could not hmac?!")
+		}
+		seed := hmacHash.Sum(nil)
 
 		const nBits = 52
 
@@ -80,6 +84,9 @@ func main() {
 		r := seedInt.Uint64()
 
 		X := float64(r) / math.Pow(2, nBits) // uniformly distributed in [0; 1)
+
+		// peel off the chain
+		hashChain = hashChain[1:]
 
 		fmt.Println("Game Id: ", gameId, "Multiplier (with no house edge): ", (1 / X), "x ... verified: ", verified)
 
