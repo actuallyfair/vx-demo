@@ -11,9 +11,12 @@ import {
   DemoFairCoinToss_Choice,
   Wager,
   Reveal,
+  computeRouletteOutcome,
+  computeFairCoinTossResult,
+  demoFairCoinToss_ChoiceToJSON,
 } from "verifier";
 
-import { getOutcomeFairCoinToss } from "verifier/dist/get-wager-outcome";
+import { computeFairCoinTossOutcome } from "verifier";
 
 async function main() {
   console.log("Running vx demo...");
@@ -68,11 +71,11 @@ async function main() {
       GS_SEED,
       utf8ToBytes(`${playerSeed}:${nonce}`) // This is inside hmac, so we're not worried about anything like length extension attacks
     );
-    const diceWager: DemoFairCoinToss = {
+    const coinTossWager: DemoFairCoinToss = {
       playerChoice,
     };
     const wager: Wager = {
-      demoFairCoinToss: diceWager,
+      demoFairCoinToss: coinTossWager,
     };
 
     const VX_SIGNATURE = await vx.make_wager(
@@ -87,17 +90,13 @@ async function main() {
     // This is actually pretty slow in js (but fine in native ), so you might want to verify in the background or in batches?
     const verified = bls.verify(VX_SIGNATURE, GS_CONTRIBUTION, VX_PUBKEY);
 
-    const outcome = getOutcomeFairCoinToss(VX_SIGNATURE, diceWager);
+    const outcome = computeFairCoinTossOutcome(VX_SIGNATURE, coinTossWager);
 
-    if (outcome.result.value == diceWager.playerChoice) {
-      balance++;
-    } else {
-      balance--;
-    }
+    balance += outcome.playerProfit.amount;
 
     console.log(
       "Outcome: ",
-      outcome.displayName,
+      demoFairCoinToss_ChoiceToJSON(outcome.result),
       " (verified =",
       verified,
       ") Your new balance is =",
