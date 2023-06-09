@@ -37,6 +37,8 @@ export async function make_wager(
   gsContribution: Uint8Array,
   wager: Wager
 ) {
+  const bytes = Wager.encode(wager).finish();
+
   // So there's two options. We need wager converted to bytes. Since we have protocolbuffers
   // lib we could simply do: Wager.encode(wager).finish();
   // That would be the recommended way, as it'd be easier to debug. But in case you don't have protobuff library,

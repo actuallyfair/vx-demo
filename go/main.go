@@ -54,7 +54,7 @@ func main() {
 
 	fmt.Println("The vx pubkey is: ", hex.EncodeToString(vxPubKey))
 
-	/// Ok ... now this process is done per bet
+	/// Ok ... now this process is done per game
 
 	gameId := 0
 	for len(hashChain) > 1 {
