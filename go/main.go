@@ -60,7 +60,7 @@ func main() {
 	for len(hashChain) > 1 {
 		gameId = gameId + 1
 
-		vxSignature := vx_make_wager(pool, GS_SEED_HASH, hashChain[0], gameId)
+		vxSignature := vx_make_message(pool, GS_SEED_HASH, hashChain[0], gameId)
 
 		verified, err := VerifySignature(vxSignature, hashChain[0], vxPubKey)
 		if err != nil {

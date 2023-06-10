@@ -7,16 +7,14 @@ import * as vx from "./vx";
 import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import {
-  DemoFairCoinToss,
-  DemoFairCoinToss_Choice,
-  Wager,
-  Reveal,
-  computeRouletteOutcome,
-  computeFairCoinTossResult,
-  demoFairCoinToss_ChoiceToJSON,
+  CommitmentContext,
+  MessageContext,
+  RevealContext,
+  FairCoinToss,
+  FairCoinToss_Choice,
+  fairCoinToss_ChoiceToJSON,
+  computeFairCoinTossOutcome,
 } from "verifier";
-
-import { computeFairCoinTossOutcome } from "verifier";
 
 async function main() {
   console.log("Running vx demo...");
@@ -25,7 +23,8 @@ async function main() {
   const GS_SEED = randomBytes(32); // very secret!
   const GS_SEED_HASH = sha256(GS_SEED);
 
-  const VX_PUBKEY = await vx.make_commitment(GS_SEED_HASH);
+  const commitContext: CommitmentContext = { sha256Commitment: {} };
+  const VX_PUBKEY = await vx.make_commitment(GS_SEED_HASH, commitContext);
 
   console.log(
     `Hey Player! We're ready to go with the following values: 
@@ -55,11 +54,11 @@ async function main() {
     if (res.toLowerCase() === "q") {
       break;
     }
-    let playerChoice: DemoFairCoinToss_Choice;
+    let playerChoice: FairCoinToss_Choice;
     if (res.toLowerCase() === "h") {
-      playerChoice = DemoFairCoinToss_Choice.HEADS;
+      playerChoice = FairCoinToss_Choice.HEADS;
     } else if (res.toLowerCase() === "t") {
-      playerChoice = DemoFairCoinToss_Choice.TAILS;
+      playerChoice = FairCoinToss_Choice.TAILS;
     } else {
       console.log("Invalid guess, try again");
       continue;
@@ -71,14 +70,14 @@ async function main() {
       GS_SEED,
       utf8ToBytes(`${playerSeed}:${nonce}`) // This is inside hmac, so we're not worried about anything like length extension attacks
     );
-    const coinTossWager: DemoFairCoinToss = {
+    const coinTossWager: FairCoinToss = {
       playerChoice,
     };
-    const wager: Wager = {
-      demoFairCoinToss: coinTossWager,
+    const wager: MessageContext = {
+      fairCoinToss: coinTossWager,
     };
 
-    const VX_SIGNATURE = await vx.make_wager(
+    const VX_SIGNATURE = await vx.make_message(
       GS_SEED_HASH,
       GS_CONTRIBUTION,
       wager
@@ -96,7 +95,7 @@ async function main() {
 
     console.log(
       "Outcome: ",
-      demoFairCoinToss_ChoiceToJSON(outcome.result),
+      fairCoinToss_ChoiceToJSON(outcome.result),
       " (verified =",
       verified,
       ") Your new balance is =",
@@ -113,12 +112,13 @@ async function main() {
   }
   rl.close();
 
-  const reveal: Reveal = {
+  const reveal: RevealContext = {
     standardDerivation: {
+      commitmentPreimage: GS_SEED,
       playerSeed: playerSeed,
     },
   };
-  await vx.make_reveal(GS_SEED_HASH, GS_SEED, reveal);
+  await vx.make_reveal(GS_SEED_HASH, reveal);
 
   console.log(
     "Thanks for playing! Your final balance is: ",

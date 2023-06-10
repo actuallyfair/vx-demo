@@ -1,6 +1,6 @@
 import * as pg from "pg";
 import { assert } from "tsafe";
-import { Wager, Reveal } from "verifier";
+import { MessageContext, CommitmentContext, RevealContext } from "verifier";
 
 // This really isn't a great example of how to use postgres. In reality want
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.
@@ -27,41 +27,44 @@ export async function queryOne(query: string, params: any[]) {
   // return rows[0];
 }
 
-export async function make_commitment(gsSeedHash: Uint8Array) {
-  const row = await queryOne("SELECT * FROM make_commitment($1)", [gsSeedHash]);
-  return row.vx_pubkey as Uint8Array;
+export async function make_commitment(
+  commitment: Uint8Array,
+  context: CommitmentContext
+) {
+  const row = await queryOne(
+    "SELECT * FROM make_commitment($1, encode_commitment_context($2))",
+    [commitment, context]
+  );
+  return row.pubkey as Uint8Array;
 }
 
-export async function make_wager(
-  gsSeedHash: Uint8Array,
-  gsContribution: Uint8Array,
-  wager: Wager
+export async function make_message(
+  commitment: Uint8Array,
+  message: Uint8Array,
+  context: MessageContext
 ) {
-  const bytes = Wager.encode(wager).finish();
-
   // So there's two options. We need wager converted to bytes. Since we have protocolbuffers
   // lib we could simply do: Wager.encode(wager).finish();
   // That would be the recommended way, as it'd be easier to debug. But in case you don't have protobuff library,
   // or don't want to install it  you could also just use json and do it
   // from inside the db with encode_wager, which we will show
   const row = await queryOne(
-    "SELECT * FROM make_wager($1, $2, encode_wager($3));",
-    [gsSeedHash, gsContribution, wager]
+    "SELECT * FROM make_message($1, $2, encode_message_context($3))",
+    [commitment, message, context]
   );
 
-  return row.vx_signature as Uint8Array;
+  return row.signature as Uint8Array;
 }
 
 export async function make_reveal(
-  gsSeedHash: Uint8Array,
-  gsSeed: Uint8Array,
-  reveal: Reveal
+  commitment: Uint8Array,
+  context: RevealContext
 ) {
-  const revealBytes = Reveal.encode(reveal).finish();
-
-  const row = await queryOne("SELECT * FROM make_reveal($1, $2, $3)", [
-    gsSeedHash,
-    gsSeed,
-    revealBytes,
+  const revealContext = RevealContext.encode(context).finish();
+  // We could also just do it from inside the db with encode_reveal_context
+  // but we need to be a bit careful as it need to base64 for the uint8array
+  const row = await queryOne("SELECT * FROM make_reveal($1, $2)", [
+    commitment,
+    revealContext,
   ]);
 }

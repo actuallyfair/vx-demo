@@ -4,7 +4,11 @@ import { hmac } from "@noble/hashes/hmac";
 import { bls12_381 as bls } from "@noble/curves/bls12-381";
 import * as vx from "./vx";
 
-import { Wager, computeVhempCrashResult } from "verifier";
+import {
+  CommitmentContext,
+  MessageContext,
+  computeVhempCrashResult,
+} from "verifier";
 
 import { assert } from "tsafe";
 
@@ -12,7 +16,7 @@ async function main() {
   console.log("Running vx crash demo...");
 
   // First lets generate a hash chain
-  const hashChainLength = 10;
+  const hashChainLength = 12;
   let iterator = randomBytes(32); // very secret!
 
   const hashChain: Uint8Array[] = [];
@@ -20,16 +24,17 @@ async function main() {
     hashChain.push(iterator);
     iterator = sha256(iterator);
   }
-  hashChain.reverse();
+  // We won't reverse the hash chain, as we'll iterate by poping off the last element
 
-  const GS_SEED_HASH = hashChain[0];
+  const GS_SEED_HASH = hashChain.pop();
   assert(GS_SEED_HASH !== undefined);
   console.log(
     "Our hash chain has been established. The terminating hash is: ",
     bytesToHex(GS_SEED_HASH)
   );
 
-  const VX_PUBKEY = await vx.make_commitment(GS_SEED_HASH);
+  const commitmentContext: CommitmentContext = { sha256Chain: {} };
+  const VX_PUBKEY = await vx.make_commitment(GS_SEED_HASH, commitmentContext);
 
   console.log(
     `Hey Player! We're ready to go with the following values: 
@@ -38,33 +43,36 @@ async function main() {
   );
 
   let gameId = 0;
-  while (hashChain.length > 1) {
-    gameId++;
+  let hash = hashChain.pop();
+  assert(hash !== undefined);
 
-    const wager: Wager = {
+  while (hashChain.length >= 1) {
+    gameId++;
+    assert(hash !== undefined);
+
+    const wager: MessageContext = {
       vhempCrash: {
         gameId,
       },
     };
 
-    const vxSignature = await vx.make_wager(GS_SEED_HASH, hashChain[0], wager);
+    const vxSignature = await vx.make_message(GS_SEED_HASH, hash, wager);
 
-    const verified = bls.verify(vxSignature, hashChain[0], VX_PUBKEY);
+    const verified = bls.verify(vxSignature, hash, VX_PUBKEY);
     if (!verified) {
       throw new Error("huh?! vx gave us something that didn't verify");
     }
 
-    const hash = hashChain.pop();
-    assert(hash);
+    // Now let's get the next hash for our game
+    hash = hashChain.pop();
+    assert(hash !== undefined);
 
     const res = computeVhempCrashResult(vxSignature, hash);
     console.log(`Game id ${gameId} = ${res.toFixed(2)}x `);
-
-    // There's really no point revealing, because each game reveals the previous anyway
-    // but technically we probably should have a special reveal for after-the-last game
   }
 
-  // request input from console input
+  // There's really no point revealing, because each game reveals the previous anyway
+  // but technically we probably should have a special reveal for after-the-last game
 }
 
 main();
