@@ -72,6 +72,7 @@ async function main() {
     );
     const coinTossWager: FairCoinToss = {
       playerChoice,
+      nonce,
     };
     const wager: MessageContext = {
       fairCoinToss: coinTossWager,

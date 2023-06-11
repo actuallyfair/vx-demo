@@ -43,6 +43,7 @@ export async function make_message(
   message: Uint8Array,
   context: MessageContext
 ) {
+  console.log("context: ", context);
   // So there's two options. We need wager converted to bytes. Since we have protocolbuffers
   // lib we could simply do: Wager.encode(wager).finish();
   // That would be the recommended way, as it'd be easier to debug. But in case you don't have protobuff library,
