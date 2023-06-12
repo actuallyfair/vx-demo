@@ -46,11 +46,13 @@ export async function make_message(
   index: number,
   context: MessageContext
 ) {
+  const contextBytes = MessageContext.encode(context).finish();
+
   const row = await queryOne("SELECT * FROM make_message($1, $2, $3, $4)", [
     commitment,
     message,
     index,
-    context,
+    contextBytes,
   ]);
 
   return row.signature as Uint8Array;
