@@ -13,7 +13,7 @@ func vx_make_commitment(pool *pgxpool.Pool, commitment []byte) []byte {
 	const commitmentContext = `{ "sha256Chain": {} }`
 
 	var vxPubKey []byte
-	err := pool.QueryRow(context.Background(), `SELECT pubkey FROM make_commitment($1, encode_commitment_context($2))`, commitment, commitmentContext).Scan(&vxPubKey)
+	err := pool.QueryRow(context.Background(), `SELECT vx_pubkey FROM make_commitment($1, encode_commitment_context($2))`, commitment, commitmentContext).Scan(&vxPubKey)
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func vx_make_message(pool *pgxpool.Pool, commitment []byte, message []byte, game
 	messageContext := `{ "vhempCrash": {} }`
 
 	var vxSignature []byte
-	err := pool.QueryRow(context.Background(), `SELECT signature FROM make_message(
+	err := pool.QueryRow(context.Background(), `SELECT vx_signature FROM make_message(
 		$1,
 		$2,
 		$3,

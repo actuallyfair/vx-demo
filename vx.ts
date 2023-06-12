@@ -37,7 +37,7 @@ export async function make_commitment(
     commitment,
     contextBytes,
   ]);
-  return row.pubkey as Uint8Array;
+  return row.vx_pubkey as Uint8Array;
 }
 
 export async function make_message(
@@ -55,7 +55,7 @@ export async function make_message(
     contextBytes,
   ]);
 
-  return row.signature as Uint8Array;
+  return row.vx_signature as Uint8Array;
 }
 
 export async function make_reveal(
