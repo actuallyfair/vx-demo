@@ -56,7 +56,12 @@ async function main() {
       },
     };
 
-    const vxSignature = await vx.make_message(GS_SEED_HASH, hash, wager);
+    const vxSignature = await vx.make_message(
+      GS_SEED_HASH,
+      hash,
+      gameId,
+      wager
+    );
 
     const verified = bls.verify(vxSignature, hash, VX_PUBKEY);
     if (!verified) {

@@ -6,7 +6,7 @@ import { MessageContext, CommitmentContext, RevealContext } from "verifier";
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.
 
 const connectionString =
-  "postgres://logger:verysecurepassword@34.145.37.118:5432/vx";
+  "postgres://writer:verysecurepassword@34.145.37.118:5432/vx";
 
 const pool = new pg.Pool({
   connectionString,
@@ -31,41 +31,42 @@ export async function make_commitment(
   commitment: Uint8Array,
   context: CommitmentContext
 ) {
-  const row = await queryOne(
-    "SELECT * FROM make_commitment($1, encode_commitment_context($2))",
-    [commitment, context]
-  );
+  const contextBytes = CommitmentContext.encode(context).finish();
+  // We could also use encode_commitment_context($2)
+  const row = await queryOne("SELECT * FROM make_commitment($1, $2)", [
+    commitment,
+    contextBytes,
+  ]);
   return row.pubkey as Uint8Array;
 }
 
 export async function make_message(
   commitment: Uint8Array,
   message: Uint8Array,
+  index: number,
   context: MessageContext
 ) {
-  console.log("context: ", context);
-  // So there's two options. We need wager converted to bytes. Since we have protocolbuffers
-  // lib we could simply do: Wager.encode(wager).finish();
-  // That would be the recommended way, as it'd be easier to debug. But in case you don't have protobuff library,
-  // or don't want to install it  you could also just use json and do it
-  // from inside the db with encode_wager, which we will show
-  const row = await queryOne(
-    "SELECT * FROM make_message($1, $2, encode_message_context($3))",
-    [commitment, message, context]
-  );
+  const row = await queryOne("SELECT * FROM make_message($1, $2, $3, $4)", [
+    commitment,
+    message,
+    index,
+    context,
+  ]);
 
   return row.signature as Uint8Array;
 }
 
 export async function make_reveal(
   commitment: Uint8Array,
+  reveal: Uint8Array,
   context: RevealContext
 ) {
   const revealContext = RevealContext.encode(context).finish();
   // We could also just do it from inside the db with encode_reveal_context
   // but we need to be a bit careful as it need to base64 for the uint8array
-  const row = await queryOne("SELECT * FROM make_reveal($1, $2)", [
+  const row = await queryOne("SELECT * FROM make_reveal($1, $2, $3)", [
     commitment,
+    reveal,
     revealContext,
   ]);
 }

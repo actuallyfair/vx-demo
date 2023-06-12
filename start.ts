@@ -72,7 +72,6 @@ async function main() {
     );
     const coinTossWager: FairCoinToss = {
       playerChoice,
-      nonce,
     };
     const wager: MessageContext = {
       fairCoinToss: coinTossWager,
@@ -81,6 +80,7 @@ async function main() {
     const VX_SIGNATURE = await vx.make_message(
       GS_SEED_HASH,
       GS_CONTRIBUTION,
+      nonce,
       wager
     );
 
@@ -115,11 +115,10 @@ async function main() {
 
   const reveal: RevealContext = {
     standardDerivation: {
-      commitmentPreimage: GS_SEED,
       playerSeed: playerSeed,
     },
   };
-  await vx.make_reveal(GS_SEED_HASH, reveal);
+  await vx.make_reveal(GS_SEED_HASH, GS_SEED, reveal);
 
   console.log(
     "Thanks for playing! Your final balance is: ",

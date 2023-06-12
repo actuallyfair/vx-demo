@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -26,13 +25,14 @@ func vx_make_message(pool *pgxpool.Pool, commitment []byte, message []byte, game
 	// const row = await queryOne("SELECT * FROM make_commitment($1)", [gsSeedHash]);
 	// return row.vx_pubkey as Uint8Array;
 
-	messageContext := fmt.Sprintf(`{ "vhempCrash": { "gameId": %v } }`, gameId)
+	messageContext := `{ "vhempCrash": {} }`
 
 	var vxSignature []byte
 	err := pool.QueryRow(context.Background(), `SELECT signature FROM make_message(
 		$1,
 		$2,
-		encode_message_context($3))`, commitment, message, messageContext).Scan(&vxSignature)
+		$3,
+		encode_message_context($4))`, commitment, message, gameId, messageContext).Scan(&vxSignature)
 	if err != nil {
 		panic(err)
 	}

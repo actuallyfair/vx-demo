@@ -45,7 +45,7 @@ func main() {
 
 	fmt.Println("The terminating hash (GS_SEED_HASH) is: ", hex.EncodeToString(GS_SEED_HASH))
 
-	pool, err := pgxpool.Connect(context.Background(), "postgres://logger:verysecurepassword@34.145.37.118:5432/vx")
+	pool, err := pgxpool.Connect(context.Background(), "postgres://writer:verysecurepassword@34.145.37.118:5432/vx")
 	if err != nil {
 		panic(err)
 	}
