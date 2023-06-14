@@ -70,7 +70,7 @@ func main() {
 			panic("wtf vx signature is not verified!")
 		}
 
-		hmacHash := hmac.New(sha256.New, hashChain[0])
+		hmacHash := hmac.New(sha256.New, vxSignature)
 		_, err = hmacHash.Write(hashChain[1])
 		if err != nil {
 			panic("could not hmac?!")
