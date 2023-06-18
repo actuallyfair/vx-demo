@@ -16,7 +16,7 @@ async function main() {
   console.log("Running vx crash demo...");
 
   // First lets generate a hash chain
-  const hashChainLength = 12;
+  const hashChainLength = 11;
   let iterator = randomBytes(32); // very secret!
 
   const hashChain: Uint8Array[] = [];
@@ -43,12 +43,11 @@ async function main() {
   );
 
   let gameId = 0;
-  let hash = hashChain.pop();
+  let hash = GS_SEED_HASH;
   assert(hash !== undefined);
 
   while (hashChain.length >= 1) {
     gameId++;
-    assert(hash !== undefined);
 
     const wager: MessageContext = {
       vhempCrash: {
@@ -69,9 +68,11 @@ async function main() {
     }
 
     // Now let's get the next hash for our game
-    hash = hashChain.pop();
-    assert(hash !== undefined);
+    const h = hashChain.pop();
+    assert(h !== undefined); // Hack to make TS happy
+    hash = h;
 
+    // Now let's compute the result of the game (note: how it uses the next games hash)
     const res = computeVhempCrashResult(vxSignature, hash);
     console.log(`Game id ${gameId} = ${res.toFixed(2)}x `);
   }
