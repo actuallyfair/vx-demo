@@ -41,16 +41,17 @@ func main() {
 	}
 	// Wow go. You're so cool. Glad there isn't a generic .reverse() method.
 
-	GS_SEED_HASH := hashChain[0]
+	commitment := hashChain[0]
 
-	fmt.Println("The terminating hash (GS_SEED_HASH) is: ", hex.EncodeToString(GS_SEED_HASH))
+	fmt.Println("The terminating hash (commitment) is: ", hex.EncodeToString(commitment))
 
 	pool, err := pgxpool.Connect(context.Background(), "postgres://writer:verysecurepassword@34.145.37.118:5432/vx")
 	if err != nil {
 		panic(err)
 	}
 
-	vxPubKey := vx_make_commitment(pool, GS_SEED_HASH)
+	vxPubKey := vx_make_commitment(pool, commitment)
+	fmt.Println("Please see:  https://provablyhonest.com/apps/demo/vx/summary/" + hex.EncodeToString(commitment))
 
 	fmt.Println("The vx pubkey is: ", hex.EncodeToString(vxPubKey))
 
@@ -60,7 +61,7 @@ func main() {
 	for len(hashChain) > 1 {
 		gameId = gameId + 1
 
-		vxSignature := vx_make_message(pool, GS_SEED_HASH, hashChain[0], gameId)
+		vxSignature := vx_make_message(pool, commitment, hashChain[0], gameId)
 
 		verified, err := VerifySignature(vxSignature, hashChain[0], vxPubKey)
 		if err != nil {

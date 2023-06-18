@@ -26,24 +26,28 @@ async function main() {
   }
   // We won't reverse the hash chain, as we'll iterate by poping off the last element
 
-  const GS_SEED_HASH = hashChain.pop();
-  assert(GS_SEED_HASH !== undefined);
+  const commitment = hashChain.pop();
+  assert(commitment !== undefined);
   console.log(
     "Our hash chain has been established. The terminating hash is: ",
-    bytesToHex(GS_SEED_HASH)
+    bytesToHex(commitment)
   );
 
   const commitmentContext: CommitmentContext = { sha256Chain: {} };
-  const VX_PUBKEY = await vx.make_commitment(GS_SEED_HASH, commitmentContext);
+  const VX_PUBKEY = await vx.make_commitment(commitment, commitmentContext);
 
   console.log(
     `Hey Player! We're ready to go with the following values: 
-    GS_SEED_HASH := ${bytesToHex(GS_SEED_HASH)}
-    VX_PUBKEY    := ${bytesToHex(VX_PUBKEY)}`
+    GS_SEED_HASH := ${bytesToHex(commitment)}
+    VX_PUBKEY    := ${bytesToHex(VX_PUBKEY)}
+    Please see:  https://provablyhonest.com/apps/demo/vx/summary/${bytesToHex(
+      commitment
+    )}
+    `
   );
 
   let gameId = 0;
-  let hash = GS_SEED_HASH;
+  let hash = commitment;
   assert(hash !== undefined);
 
   while (hashChain.length >= 1) {
@@ -55,12 +59,7 @@ async function main() {
       },
     };
 
-    const vxSignature = await vx.make_message(
-      GS_SEED_HASH,
-      hash,
-      gameId,
-      wager
-    );
+    const vxSignature = await vx.make_message(commitment, hash, gameId, wager);
 
     const verified = bls.verify(vxSignature, hash, VX_PUBKEY);
     if (!verified) {
