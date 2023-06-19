@@ -86,10 +86,12 @@ func main() {
 
 		X := float64(r) / math.Pow(2, nBits) // uniformly distributed in [0; 1)
 
+		crash := 1 / (1 - X)
+
 		// peel off the chain
 		hashChain = hashChain[1:]
 
-		fmt.Println("Game Id: ", gameId, "Multiplier (with no house edge): ", (1 / X), "x ... verified: ", verified)
+		fmt.Println("Game Id: ", gameId, "Multiplier (with no house edge): ", crash, "x ... verified: ", verified)
 
 	}
 
