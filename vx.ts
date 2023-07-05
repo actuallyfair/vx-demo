@@ -6,7 +6,7 @@ import { MessageContext, CommitmentContext, RevealContext } from "verifier";
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.
 
 const connectionString =
-  "postgres://writer:verysecurepassword@34.145.37.118:5432/vx";
+  "postgres://writer:verysecurepassword@dev-db.provablyhonest.com:5432/demo";
 
 const pool = new pg.Pool({
   connectionString,

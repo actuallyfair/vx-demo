@@ -45,7 +45,7 @@ func main() {
 
 	fmt.Println("The terminating hash (commitment) is: ", hex.EncodeToString(commitment))
 
-	pool, err := pgxpool.Connect(context.Background(), "postgres://writer:verysecurepassword@34.145.37.118:5432/vx")
+	pool, err := pgxpool.Connect(context.Background(), "postgres://writer:verysecurepassword@dev-db.provablyhonest.com:5432/demo")
 	if err != nil {
 		panic(err)
 	}

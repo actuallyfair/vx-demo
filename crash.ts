@@ -1,6 +1,5 @@
-import { bytesToHex, randomBytes, utf8ToBytes } from "@noble/hashes/utils";
+import { bytesToHex, randomBytes } from "@noble/hashes/utils";
 import { sha256 } from "@noble/hashes/sha256";
-import { hmac } from "@noble/hashes/hmac";
 import { bls12_381 as bls } from "@noble/curves/bls12-381";
 import * as vx from "./vx";
 
