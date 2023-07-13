@@ -1,4 +1,9 @@
-import { bytesToHex, randomBytes } from "@noble/hashes/utils";
+import {
+  bytesToHex,
+  concatBytes,
+  randomBytes,
+  utf8ToBytes,
+} from "@noble/hashes/utils";
 import { sha256 } from "@noble/hashes/sha256";
 import { bls12_381 as bls } from "@noble/curves/bls12-381";
 import * as vx from "./vx";
@@ -10,6 +15,8 @@ import {
 } from "verifier";
 
 import { assert } from "tsafe";
+
+const clientSeed = "chicken"; // Note: this is treated as ascii
 
 async function main() {
   console.log("Running vx crash demo...");
@@ -37,7 +44,7 @@ async function main() {
 
   console.log(
     `Hey Player! We're ready to go with the following values: 
-    GS_SEED_HASH := ${bytesToHex(commitment)}
+    COMMITMENT := ${bytesToHex(commitment)}
     VX_PUBKEY    := ${bytesToHex(VX_PUBKEY)}
     Please see:  https://provablyhonest.com/apps/demo/vx/summary/${bytesToHex(
       commitment
@@ -58,9 +65,15 @@ async function main() {
       },
     };
 
-    const vxSignature = await vx.make_message(commitment, hash, gameId, wager);
+    const message = concatBytes(hash, utf8ToBytes(clientSeed));
+    const vxSignature = await vx.make_message(
+      commitment,
+      message,
+      gameId,
+      wager
+    );
 
-    const verified = bls.verify(vxSignature, hash, VX_PUBKEY);
+    const verified = bls.verify(vxSignature, message, VX_PUBKEY);
     if (!verified) {
       throw new Error("huh?! vx gave us something that didn't verify");
     }

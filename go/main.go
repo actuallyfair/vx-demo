@@ -14,6 +14,8 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
+var clientSeed = []byte("dogsoup") // note this is ascii (we're not hex-decoding it)
+
 func main() {
 
 	// Generate a hash chain
@@ -61,9 +63,11 @@ func main() {
 	for len(hashChain) > 1 {
 		gameId = gameId + 1
 
-		vxSignature := vx_make_message(pool, commitment, hashChain[0], gameId)
+		message := append(hashChain[0], clientSeed...)
 
-		verified, err := VerifySignature(vxSignature, hashChain[0], vxPubKey)
+		vxSignature := vx_make_message(pool, commitment, message, gameId)
+
+		verified, err := VerifySignature(vxSignature, message, vxPubKey)
 		if err != nil {
 			panic(err)
 		}
