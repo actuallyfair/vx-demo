@@ -6,7 +6,8 @@
   "scripts": {
     "crash": "ts-node crash.ts",
     "hilo": "ts-node hilo.ts",
-    "dice": "ts-node dice.ts"
+    "dice": "ts-node dice.ts",
+    "roulette": "ts-node roulette"
   },
   "author": "",
   "license": "ISC",
