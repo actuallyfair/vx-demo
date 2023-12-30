@@ -11,7 +11,7 @@ import * as vx from "./vx";
 import {
   CommitmentContext,
   MessageContext,
-  computeVhempCrashResult,
+  computeCrashResult,
 } from "verifier";
 
 import { assert } from "tsafe";
@@ -60,8 +60,8 @@ async function main() {
     gameId++;
 
     const wager: MessageContext = {
-      vhempCrash: {
-        gameId,
+      crash: {
+        houseEdge: 0.0,
       },
     };
 
@@ -84,7 +84,7 @@ async function main() {
     hash = h;
 
     // Now let's compute the result of the game (note: how it uses the next games hash)
-    const res = computeVhempCrashResult(vxSignature, hash);
+    const res = computeCrashResult(vxSignature, hash);
     console.log(`Game id ${gameId} = ${res.toFixed(2)}x `);
   }
 
