@@ -12,8 +12,8 @@ import {
   RevealContext,
   computeCrashDiceResult,
 } from "verifier";
-import { assert } from "tsafe";
 import { CrashDice } from "verifier/dist/generated/message-contexts/crash-dice";
+import { Currency } from "verifier/dist/generated/currency";
 
 const houseEdge = 0.01; // fixed
 const playerBalance = 0;
@@ -68,7 +68,7 @@ async function main() {
 
     // ok we're betting
 
-    const amount = { currency: 0, value: 1 };
+    const amount = { currency: Currency.BTC, value: 1 }; // this means 1 satoshi
     const crashDice: CrashDice = { amount, houseEdge, target };
     const wager: MessageContext = {
       crashDice,

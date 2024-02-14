@@ -8,7 +8,8 @@
     "hilo": "ts-node hilo.ts",
     "dice": "ts-node dice.ts",
     "roulette": "ts-node roulette",
-    "mines": "ts-node mines.ts"
+    "mines": "ts-node mines.ts",
+    "tower": "ts-node tower.ts"
   },
   "author": "",
   "license": "ISC",
