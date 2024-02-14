@@ -2,9 +2,14 @@ To run this do
 
 > npm install
 
-> npm run crash # crash demo
-> npm run dice # dice demo
-> npm run hilo # hilo demo
-> npm run roulette # roulette demo
+And pick which game you wish to run:
+
+```
+> npm run crash
+> npm run dice
+> npm run hilo
+> npm run roulette
+> npm run tower
+```
 
 And then follow the prompts. The code simulates being a "game server" while you are the player
