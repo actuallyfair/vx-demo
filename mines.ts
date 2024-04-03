@@ -11,6 +11,8 @@ import { assert } from "tsafe";
 import { bytesToNumberBE } from "@noble/curves/abstract/utils";
 import { Currency } from "verifier/dist/generated/currency";
 
+import { computeMineLocations } from "verifier/dist/compute-wager";
+
 async function main() {
   console.log("Running vx demo... (mines)");
 
@@ -115,7 +117,7 @@ async function main() {
 
         console.log("You have been cashed out! ");
 
-        const mineLocations = getMineLocations(
+        const mineLocations = computeMineLocations(
           vxSignature,
           revealedCells,
           cells,
@@ -160,7 +162,7 @@ async function main() {
 
         subIndex++;
 
-        const mineLocations = getMineLocations(
+        const mineLocations = computeMineLocations(
           vxSignature,
           revealedCells,
           cells,
@@ -210,38 +212,3 @@ async function main() {
 }
 
 main();
-
-function getMineLocations(
-  vxSignature: Uint8Array,
-  revealedCells: Set<number>, // tiles we know are safe
-  cells: number, // how many cells in total
-  mines: number // how many mines there are going to be in total
-) {
-  let mineLocations = new Set<number>();
-
-  for (let m = 0; m < mines; m++) {
-    const cellsLeft = cells - revealedCells.size - m;
-
-    if (cellsLeft == 0) {
-      console.warn(
-        "hmm trying to get mine locations when there's no locations left?"
-      );
-      break;
-    }
-
-    let mineIndex = Number(bytesToNumberBE(vxSignature) % BigInt(cellsLeft));
-
-    for (let i = 0; i < cells; i++) {
-      if (revealedCells.has(i)) {
-        mineIndex++;
-        continue;
-      }
-      if (mineIndex == i) {
-        mineLocations.add(i);
-        break;
-      }
-    }
-  }
-
-  return mineLocations;
-}
