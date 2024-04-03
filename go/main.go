@@ -47,13 +47,13 @@ func main() {
 
 	fmt.Println("The terminating hash (commitment) is: ", hex.EncodeToString(commitment))
 
-	pool, err := pgxpool.Connect(context.Background(), "postgres://writer:verysecurepassword@dev-db.provablyhonest.com:5432/demo")
+	pool, err := pgxpool.Connect(context.Background(), "postgresql://demo_writer:verysecurepassword@vxdemo.actuallyfair.com/demo")
 	if err != nil {
 		panic(err)
 	}
 
 	vxPubKey := vx_make_commitment(pool, commitment)
-	fmt.Println("Please see:  https://provablyhonest.com/apps/demo/vx/summary/" + hex.EncodeToString(commitment))
+	fmt.Println("Please see:  https://actuallyfair.com/apps/demo/vx/summary/" + hex.EncodeToString(commitment))
 
 	fmt.Println("The vx pubkey is: ", hex.EncodeToString(vxPubKey))
 

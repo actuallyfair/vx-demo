@@ -16,24 +16,17 @@ async function main() {
 
   // Let's generate a random seed
   const GS_SEED = randomBytes(32); // very secret!
-  const GS_SEED_HASH = sha256(GS_SEED);
+  const commitment = sha256(GS_SEED);
 
-  const mines = 3;
-  const cellLineBreak = 8;
-  const cells = cellLineBreak * cellLineBreak;
+  const mines = 1;
+  const cellLineBreak = 2;
+  const cells = 4;
 
   const commitContext: CommitmentContext = { sha256Commitment: {} };
-  const VX_PUBKEY = await vx.make_commitment(GS_SEED_HASH, commitContext);
+  const VX_PUBKEY = await vx.make_commitment(commitment, commitContext);
 
   console.log(
-    `Hey Player! We're ready to go with the following values: 
-    COMMITMENT := ${bytesToHex(GS_SEED_HASH)}
-    VX_PUBKEY    := ${bytesToHex(VX_PUBKEY)}
-    with ${mines} mines in ${cells} grid`
-  );
-
-  console.log(
-    `Normally we'd show it to a player as single value (by either hashing them together, or concat'ing them) to make it easier to copy&paste, but you seem pretty technical`
+    `We are going to play mines with ${mines} mines in a ${cells} cell grid`
   );
 
   console.log("--");
@@ -45,10 +38,11 @@ async function main() {
   console.log("Client seed is: ", playerSeed);
 
   let balance = 0;
-  let nonce = 0;
+
+  let index = 0;
   while (true) {
     const res = await rl.question(
-      `[${nonce}] Do you want to bet (B) or Quit (Q): `
+      `[${index}] Do you want to bet (B) or Quit (Q): `
     );
     if (res.toLowerCase() === "q") {
       break;
@@ -72,28 +66,37 @@ async function main() {
         },
       },
     };
+    let subIndex = 0;
 
-    const gsContribution = hmac(
+    const message = hmac(
       sha256,
       GS_SEED,
-      utf8ToBytes(`${playerSeed}:${nonce}`) // This is inside hmac, so we're not worried about anything like length extension attacks
+      utf8ToBytes(`${playerSeed}:${index}`) // We don't use the subIndex here, because it's zero
     );
+    subIndex++;
 
     const vxSignature = await vx.make_message(
-      GS_SEED_HASH,
-      gsContribution,
-      nonce,
+      commitment,
+      message,
+      index,
+      subIndex,
       wager
     );
-    const verified = bls.verify(vxSignature, gsContribution, VX_PUBKEY);
+    const verified = bls.verify(vxSignature, message, VX_PUBKEY);
     assert(verified);
     balance -= amount.value;
 
-    let picked = 0;
+    let revealedCells: Set<number> = new Set();
 
     while (true) {
       const res = await rl.question(
-        `[${nonce}] Pick a number between 0 and ${cells - 1} or Cashout (C)?: `
+        `[${index}] Pick a number between 0 and ${cells - 1} or Cashout (C)?: `
+      );
+
+      const message = hmac(
+        sha256,
+        GS_SEED,
+        utf8ToBytes(`${playerSeed}:${index}:${subIndex}`)
       );
 
       if (res.toLowerCase() === "c") {
@@ -102,65 +105,83 @@ async function main() {
             cashout: true,
           },
         };
-        const gsContribution = hmac(
-          sha256,
-          GS_SEED,
-          utf8ToBytes(`${playerSeed}:${nonce}:cashout`) // This is inside hmac, so we're not worried about anything like length extension attacks
-        );
-
         const vxSignature = await vx.make_message(
-          GS_SEED_HASH,
-          gsContribution,
-          nonce,
+          commitment,
+          message,
+          index,
+          subIndex,
           messageContext
         );
-        const verified = bls.verify(vxSignature, gsContribution, VX_PUBKEY);
+        const verified = bls.verify(vxSignature, message, VX_PUBKEY);
         assert(verified);
+        subIndex++;
 
         console.log("You have been cashed out! ");
+
+        const mineLocations = getMineLocations(
+          vxSignature,
+          revealedCells,
+          cells,
+          mines
+        );
+
+        console.log("The rest of the mines were here: ", mineLocations);
         // TODO: ..some deterministic algo to fill the rest of the board
         // TODO: figure out their winnings
       } else {
-        const cell = Number.parseInt(res, 10);
-        if (!Number.isSafeInteger(cell) || cell < 0 || cell >= cells) {
+        const pickedCell = Number.parseInt(res, 10);
+        if (
+          !Number.isSafeInteger(pickedCell) ||
+          pickedCell < 0 ||
+          pickedCell >= cells
+        ) {
           console.log("Unknown command or invalid");
           continue; // try again...
         }
         const messageContext: MessageContext = {
           mines: {
             move: {
-              cell,
+              cell: pickedCell,
             },
           },
         };
         const gsContribution = hmac(
           sha256,
           GS_SEED,
-          utf8ToBytes(`${playerSeed}:${nonce}:${cell}`) // This is inside hmac, so we're not worried about anything like length extension attacks
+          utf8ToBytes(`${playerSeed}:${index}:${subIndex}`)
         );
 
         const vxSignature = await vx.make_message(
-          GS_SEED_HASH,
+          commitment,
           gsContribution,
-          nonce,
+          index,
+          subIndex,
           messageContext
         );
         const verified = bls.verify(vxSignature, gsContribution, VX_PUBKEY);
         assert(verified);
 
-        const normalized = Number(
-          bytesToNumberBE(vxSignature) % BigInt(cells - picked)
+        subIndex++;
+
+        const mineLocations = getMineLocations(
+          vxSignature,
+          revealedCells,
+          cells,
+          mines
         );
 
-        if (normalized < mines) {
-          console.log("You hit a mine! Sorry!", normalized, picked);
+        if (mineLocations.has(pickedCell)) {
+          console.log("oh no, you hit a mine. Sorry!");
+          console.log("The cells with mines were: ", mineLocations);
           break;
+        } else {
+          console.log("phew, you are safe. ");
+          revealedCells.add(pickedCell);
         }
-        picked++;
       }
     }
 
-    nonce++;
+    index++;
   }
   rl.close();
 
@@ -169,7 +190,7 @@ async function main() {
       playerSeed: playerSeed,
     },
   };
-  await vx.make_reveal(GS_SEED_HASH, GS_SEED, reveal);
+  await vx.make_reveal(commitment, GS_SEED, reveal);
 
   console.log(
     "Thanks for playing! ",
@@ -177,14 +198,14 @@ async function main() {
     "\nJust to recap, the information you'll need to verify your games is: ",
     {
       GS_SEED: bytesToHex(GS_SEED),
-      GS_SEED_HASH: bytesToHex(GS_SEED_HASH),
+      COMMITMENT: bytesToHex(commitment),
       VX_PUBKEY: bytesToHex(VX_PUBKEY),
-      GAMES_PLAYED: nonce,
+      GAMES_PLAYED: index,
     }
   );
   console.log(
-    `https://www.provablyhonest.com/apps/demo/vx/summary/${bytesToHex(
-      GS_SEED_HASH
+    `https://www.actuallyfair.com/apps/demo/vx/summary/${bytesToHex(
+      commitment
     )}`
   );
 
@@ -192,3 +213,37 @@ async function main() {
 }
 
 main();
+
+function getMineLocations(
+  vxSignature: Uint8Array,
+  revealedCells: Set<number>, // tiles we know are safe
+  cells: number, // how many cells in total
+  mines: number // how many mines there are going to be in total
+) {
+  let mineLocations = new Set<number>();
+
+  for (let m = 0; m < mines; m++) {
+    const cellsLeft = cells - revealedCells.size - m;
+
+    if (cellsLeft == 0) {
+      console.warn(
+        "hmm trying to get mine locations when there's no locations left?"
+      );
+      break;
+    }
+
+    let mineIndex = bytesToNumberBE(vxSignature) % BigInt(cellsLeft);
+
+    for (let i = 0; i < cells; i++) {
+      if (mineIndex == 0n) {
+        mineLocations.add(i);
+        break;
+      }
+      if (!revealedCells.has(i)) {
+        mineIndex--;
+      }
+    }
+  }
+
+  return mineLocations;
+}

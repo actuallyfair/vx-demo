@@ -33,7 +33,7 @@ async function main() {
     with ${levels} levels  with ${minesPerLevel} mines out of  ${choicesPerLevel} options`
   );
 
-  const url = `https://provablyhonest.com/apps/demo/vx/summary/${bytesToHex(
+  const url = `https://actuallyfair.com/apps/demo/vx/summary/${bytesToHex(
     COMMITMENT
   )}`;
   console.log(
@@ -89,6 +89,7 @@ async function main() {
       COMMITMENT,
       gsContribution,
       nonce,
+      0,
       wager
     );
     const verified = bls.verify(vxSignature, gsContribution, VX_PUBKEY);
@@ -120,6 +121,7 @@ async function main() {
           COMMITMENT,
           gsContribution,
           nonce,
+          0,
           messageContext
         );
         const verified = bls.verify(vxSignature, gsContribution, VX_PUBKEY);
@@ -155,6 +157,7 @@ async function main() {
           COMMITMENT,
           gsContribution,
           nonce,
+          0,
           messageContext
         );
         const verified = bls.verify(vxSignature, gsContribution, VX_PUBKEY);
@@ -195,7 +198,7 @@ async function main() {
     }
   );
   console.log(
-    `https://www.provablyhonest.com/apps/demo/vx/summary/${bytesToHex(
+    `https://www.actuallyfair.com/apps/demo/vx/summary/${bytesToHex(
       COMMITMENT
     )}`
   );

@@ -46,7 +46,7 @@ async function main() {
     `Hey Player! We're ready to go with the following values: 
     COMMITMENT := ${bytesToHex(commitment)}
     VX_PUBKEY    := ${bytesToHex(VX_PUBKEY)}
-    Please see:  https://provablyhonest.com/apps/demo/vx/summary/${bytesToHex(
+    Please see:  https://actuallyfair.com/apps/demo/vx/summary/${bytesToHex(
       commitment
     )}
     `
@@ -70,6 +70,7 @@ async function main() {
       commitment,
       message,
       gameId,
+      0,
       wager
     );
 

@@ -1,3 +1,4 @@
+import { bytesToHex } from "@noble/hashes/utils";
 import * as pg from "pg";
 import { assert } from "tsafe";
 import { MessageContext, CommitmentContext, RevealContext } from "verifier";
@@ -32,30 +33,52 @@ export async function make_commitment(
   context: CommitmentContext
 ) {
   const contextBytes = CommitmentContext.encode(context).finish();
-  // We could also use encode_commitment_context($2)
-  const row = await queryOne("SELECT * FROM make_commitment($1, $2)", [
+
+  const insertCommitmentsQuery =
+    "INSERT INTO commitments(commitment, context) VALUES($1, $2) RETURNING id, vx_pubkey";
+
+  const row = await queryOne(insertCommitmentsQuery, [
     commitment,
     contextBytes,
   ]);
-  return row.vx_pubkey as Uint8Array;
+
+  const vxPubkey = row.vx_pubkey as Uint8Array;
+
+  console.log(
+    `Vx: insert into commitments: https://actuallyfair.com/apps/demo/vx/commitments/${row.id}`
+  );
+  console.log(`VX_PUBKEY := 0x${bytesToHex(vxPubkey)}`);
+
+  return vxPubkey;
 }
 
 export async function make_message(
   commitment: Uint8Array,
   message: Uint8Array,
   index: number,
+  subIndex: number,
   context: MessageContext
 ) {
+  const insertMessagesQuery = `INSERT INTO messages(commitment, message, index, sub_index, context) VALUES($1, $2, $3, $4, $5) RETURNING id, vx_signature`;
+
   const contextBytes = MessageContext.encode(context).finish();
 
-  const row = await queryOne("SELECT * FROM make_message($1, $2, $3, $4)", [
+  const row = await queryOne(insertMessagesQuery, [
     commitment,
     message,
     index,
+    subIndex,
     contextBytes,
   ]);
 
-  return row.vx_signature as Uint8Array;
+  const vxSignature = row.vx_signature as Uint8Array;
+
+  console.log(
+    `Vx: insert into messages: https://actuallyfair.com/apps/demo/vx/messages/${row.id}`
+  );
+  console.log(`VX_SIGNATURE := 0x${bytesToHex(vxSignature)}`);
+
+  return vxSignature;
 }
 
 export async function make_reveal(
@@ -63,12 +86,21 @@ export async function make_reveal(
   reveal: Uint8Array,
   context: RevealContext
 ) {
+  const insertRevealsQuery = `INSERT INTO reveals(commitment, reveal, context) VALUES($1, $2, $3) RETURNING id, vx_private_key`;
+
   const revealContext = RevealContext.encode(context).finish();
-  // We could also just do it from inside the db with encode_reveal_context
-  // but we need to be a bit careful as it need to base64 for the uint8array
-  const row = await queryOne("SELECT * FROM make_reveal($1, $2, $3)", [
+
+  const row = await queryOne(insertRevealsQuery, [
     commitment,
     reveal,
     revealContext,
   ]);
+
+  const vxPrivateKey = row.vx_private_key as Uint8Array;
+
+  console.log(
+    `Vx: insert into reveals: https://actuallyfair.com/apps/demo/vx/reveals/${row.id}`
+  );
+
+  return vxPrivateKey;
 }
