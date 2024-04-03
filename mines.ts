@@ -34,9 +34,6 @@ async function main() {
   // Allow the user to pick their own player seed by using console input
   const rl = readline.createInterface({ input: stdin, output: stdout });
   const playerSeed = await rl.question("Enter player Seed: ");
-
-  console.log("Client seed is: ", playerSeed);
-
   let balance = 0;
 
   let index = 0;
@@ -232,15 +229,16 @@ function getMineLocations(
       break;
     }
 
-    let mineIndex = bytesToNumberBE(vxSignature) % BigInt(cellsLeft);
+    let mineIndex = Number(bytesToNumberBE(vxSignature) % BigInt(cellsLeft));
 
     for (let i = 0; i < cells; i++) {
-      if (mineIndex == 0n) {
+      if (revealedCells.has(i)) {
+        mineIndex++;
+        continue;
+      }
+      if (mineIndex == i) {
         mineLocations.add(i);
         break;
-      }
-      if (!revealedCells.has(i)) {
-        mineIndex--;
       }
     }
   }
