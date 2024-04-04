@@ -4,18 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "crash": "ts-node crash.ts",
-    "hilo": "ts-node hilo.ts",
-    "dice": "ts-node dice.ts",
-    "roulette": "ts-node roulette",
-    "mines": "ts-node mines.ts",
-    "tower": "ts-node tower.ts"
+    "crash": "tsx crash.ts",
+    "hilo": "tsx hilo.ts",
+    "dice": "tsx dice.ts",
+    "mines": "tsx mines.ts",
+    "tower": "tsx tower.ts",
+    "multi-roulette": "tsx multi-roulette.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/pg": "^8.10.1",
-    "ts-node": "^10.9.1",
+    "tsx": "^4.7.2",
     "typescript": "^5.0.4"
   },
   "dependencies": {

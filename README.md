@@ -8,7 +8,7 @@ And pick which game you wish to run:
 > npm run crash
 > npm run dice
 > npm run hilo
-> npm run roulette
+> npm run multi-roulette
 > npm run tower
 ```
 
