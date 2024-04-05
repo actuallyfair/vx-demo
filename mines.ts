@@ -72,7 +72,6 @@ async function main() {
       GS_SEED,
       utf8ToBytes(`${playerSeed}:${index}`) // We don't use the subIndex here, because it's zero
     );
-    subIndex++;
 
     const vxSignature = await vx.make_message(
       commitment,
@@ -84,6 +83,7 @@ async function main() {
     const verified = bls.verify(vxSignature, message, VX_PUBKEY);
     assert(verified);
     balance -= amount.value;
+    subIndex++;
 
     let revealedCells: Set<number> = new Set();
 
