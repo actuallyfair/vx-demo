@@ -85,8 +85,8 @@ async function main() {
     hash = h;
 
     // Now let's compute the result of the game (note: how it uses the next games hash)
-    const res = computeCrashResult(vxSignature, hash);
-    console.log(`Game id ${gameId} = ${res.toFixed(2)}x `);
+    const res = computeCrashResult(vxSignature, hash); // the multiplier is already floor'd to ~2 digits after the decimal
+    console.log(`Game id ${gameId} = ${res}x `);
   }
 
   // There's really no point revealing, because each game reveals the previous anyway
