@@ -64,10 +64,12 @@ async function main() {
   let gameId = 0;
   let hash: Uint8Array;
 
-  while (hashChain.length >= 1) {
+  while (true) {
     // Now let's get the next hash for our game
     const h = hashChain.pop();
-    assert(h !== undefined); // Hack to make TS happy
+    if (h == undefined) {
+      break; // we've run out of things from the hash chain
+    }
     hash = h;
 
     gameId++;
