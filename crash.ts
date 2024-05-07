@@ -53,10 +53,14 @@ async function main() {
   );
 
   let gameId = 0;
-  let hash = commitment;
-  assert(hash !== undefined);
+  let hash: Uint8Array;
 
   while (hashChain.length >= 1) {
+    // Now let's get the next hash for our game
+    const h = hashChain.pop();
+    assert(h !== undefined); // Hack to make TS happy
+    hash = h;
+
     gameId++;
 
     const wager: MessageContext = {
@@ -78,11 +82,6 @@ async function main() {
     if (!verified) {
       throw new Error("huh?! vx gave us something that didn't verify");
     }
-
-    // Now let's get the next hash for our game
-    const h = hashChain.pop();
-    assert(h !== undefined); // Hack to make TS happy
-    hash = h;
 
     // Now let's compute the result of the game (note: how it uses the next games hash)
     const res = computeCrashResult(vxSignature, hash); // the multiplier is already floor'd to ~2 digits after the decimal

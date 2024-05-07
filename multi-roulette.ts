@@ -62,10 +62,14 @@ async function main() {
   );
 
   let gameId = 0;
-  let hash = commitment;
-  assert(hash !== undefined);
+  let hash: Uint8Array;
 
   while (hashChain.length >= 1) {
+    // Now let's get the next hash for our game
+    const h = hashChain.pop();
+    assert(h !== undefined); // Hack to make TS happy
+    hash = h;
+
     gameId++;
 
     const red: MultiRoulette_Outcome = {
@@ -130,11 +134,6 @@ async function main() {
       throw new Error("unknown roulette outcome?!");
     }
     console.log(`Game id ${gameId} = ${outcomeName}`);
-
-    // Now let's get the next hash for our game
-    const h = hashChain.pop();
-    assert(h !== undefined); // Hack to make TS happy
-    hash = h;
   }
 
   // There's really no point revealing, but after all done we can... (Todo:...)
