@@ -1,69 +1,69 @@
 // This is commented out for reference because it uses the blst library
 // which is native code. It's nicer in go to use a pure go library
-// although they have no nice API it's harder to use
+// but because the pure go version has no nice API it's harder to use
 
-// package main
+package main
 
-// import (
-// 	"errors"
-// 	"fmt"
+import (
+	"errors"
+	"fmt"
 
-// 	blst "github.com/supranational/blst/bindings/go"
-// )
+	blst "github.com/supranational/blst/bindings/go"
+)
 
-// func VerifySignature(signature, message, pubkey []byte) (bool, error) {
-// 	sig, err := NewSignatureFromBytes(signature)
-// 	if err != nil {
-// 		return false, err
-// 	}
-// 	domain := []byte("BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_NUL_")
+func VerifySignature(signature, message, pubkey []byte) (bool, error) {
+	sig, err := NewSignatureFromBytes(signature)
+	if err != nil {
+		return false, err
+	}
+	domain := []byte("BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_NUL_")
 
-// 	pk, err := NewPublicKeyFromBytes(pubkey)
-// 	if err != nil {
-// 		return false, err
-// 	}
+	pk, err := NewPublicKeyFromBytes(pubkey)
+	if err != nil {
+		return false, err
+	}
 
-// 	verified := sig.Verify(false, pk, false, message, domain)
-// 	return verified, nil
-// }
+	verified := sig.Verify(false, pk, false, message, domain)
+	return verified, nil
+}
 
-// type PublicKey = blst.P1Affine
-// type Signature = blst.P2Affine
+type PublicKey = blst.P1Affine
+type Signature = blst.P2Affine
 
-// const signatureLength = 96
+const signatureLength = 96
 
-// func NewSignatureFromBytes(b []byte) (*Signature, error) {
-// 	if len(b) != signatureLength {
-// 		return nil, fmt.Errorf("bls(signature): invalid signature length. should be %d", signatureLength)
-// 	}
-// 	signature := new(Signature).Uncompress(b)
-// 	if signature == nil {
-// 		return nil, errors.New("bls(signature): invalid signature")
-// 	}
-// 	// Group check signature. Do not check for infinity since an aggregated signature
-// 	// could be infinite.
-// 	if !signature.SigValidate(false) {
-// 		return nil, errors.New("bls(signature): not in group")
-// 	}
-// 	return signature, nil
-// }
+func NewSignatureFromBytes(b []byte) (*Signature, error) {
+	if len(b) != signatureLength {
+		return nil, fmt.Errorf("bls(signature): invalid signature length. should be %d", signatureLength)
+	}
+	signature := new(Signature).Uncompress(b)
+	if signature == nil {
+		return nil, errors.New("bls(signature): invalid signature")
+	}
+	// Group check signature. Do not check for infinity since an aggregated signature
+	// could be infinite.
+	if !signature.SigValidate(false) {
+		return nil, errors.New("bls(signature): not in group")
+	}
+	return signature, nil
+}
 
-// const publicKeyLength = 48
+const publicKeyLength = 48
 
-// func NewPublicKeyFromBytes(b []byte) (*PublicKey, error) {
-// 	if len(b) != publicKeyLength {
-// 		return nil, fmt.Errorf("bls(public): invalid key length. should be %d", publicKeyLength)
-// 	}
+func NewPublicKeyFromBytes(b []byte) (*PublicKey, error) {
+	if len(b) != publicKeyLength {
+		return nil, fmt.Errorf("bls(public): invalid key length. should be %d", publicKeyLength)
+	}
 
-// 	// Subgroup check NOT done when decompressing pubkey.
-// 	p := new(PublicKey).Uncompress(b)
-// 	if p == nil {
-// 		return nil, fmt.Errorf("bls(public): invalid key")
-// 	}
-// 	// Subgroup and infinity check
-// 	if !p.KeyValidate() {
-// 		return nil, fmt.Errorf("bls(public): not in group")
-// 	}
+	// Subgroup check NOT done when decompressing pubkey.
+	p := new(PublicKey).Uncompress(b)
+	if p == nil {
+		return nil, fmt.Errorf("bls(public): invalid key")
+	}
+	// Subgroup and infinity check
+	if !p.KeyValidate() {
+		return nil, fmt.Errorf("bls(public): not in group")
+	}
 
-// 	return p, nil
-// }
+	return p, nil
+}
