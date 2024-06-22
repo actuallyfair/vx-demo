@@ -11,9 +11,9 @@ import {
   MessageContext,
   RevealContext,
   computeCrashDiceResult,
-} from "verifier";
-import { CrashDice } from "verifier/dist/generated/message-contexts/crash-dice";
-import { Currency } from "verifier/dist/generated/currency";
+} from "vx-verifier";
+import { CrashDice } from "vx-verifier/dist/generated/message-contexts/crash-dice";
+import { Currency } from "vx-verifier/dist/generated/currency";
 
 const houseEdge = 0.01; // fixed
 

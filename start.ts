@@ -14,7 +14,7 @@ import {
   FairCoinToss_Choice,
   fairCoinToss_ChoiceToJSON,
   computeFairCoinTossOutcome,
-} from "verifier";
+} from "vx-verifier";
 
 async function main() {
   console.log("Running vx demo...");

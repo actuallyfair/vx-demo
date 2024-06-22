@@ -6,7 +6,7 @@ import * as vx from "./vx";
 
 import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
-import { CommitmentContext, MessageContext, RevealContext } from "verifier";
+import { CommitmentContext, MessageContext, RevealContext } from "vx-verifier";
 import { assert } from "tsafe";
 import { bytesToNumberBE } from "@noble/curves/abstract/utils";
 

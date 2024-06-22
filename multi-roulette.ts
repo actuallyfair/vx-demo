@@ -13,11 +13,11 @@ import {
   MessageContext,
   computeCrashResult,
   computeMultiRouletteResult,
-} from "verifier";
+} from "vx-verifier";
 
 import { assert } from "tsafe";
-import { MultiRoulette_Outcome } from "verifier/dist/generated/message-contexts/multi-roulette";
-import { Currency } from "verifier/dist/generated/currency";
+import { MultiRoulette_Outcome } from "vx-verifier/dist/generated/message-contexts/multi-roulette";
+import { Currency } from "vx-verifier/dist/generated/currency";
 
 const clientSeed = "chicken"; // Note: this is treated as ascii, should be found via a seeding event
 

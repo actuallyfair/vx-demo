@@ -1,7 +1,7 @@
 import { bytesToHex } from "@noble/hashes/utils";
 import * as pg from "pg";
 import { assert } from "tsafe";
-import { MessageContext, CommitmentContext, RevealContext } from "verifier";
+import { MessageContext, CommitmentContext, RevealContext } from "vx-verifier";
 
 // This really isn't a great example of how to use postgres. In reality want
 // to use a persistent connection (or more likely a connection pool) and not just create a connection for every query.

@@ -13,8 +13,8 @@ import {
   HiLoStart,
   MessageContext,
   RevealContext,
-} from "verifier";
-import { HiLo } from "verifier";
+} from "vx-verifier";
+import { HiLo } from "vx-verifier";
 import { assert } from "tsafe";
 import { bytesToNumberBE } from "@noble/curves/abstract/utils";
 
