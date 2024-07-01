@@ -8,12 +8,7 @@ import { sha256 } from "@noble/hashes/sha256";
 import { bls12_381 as bls } from "@noble/curves/bls12-381";
 import * as vx from "./vx";
 
-import {
-  CommitmentContext,
-  MessageContext,
-  computeCrashResult,
-  computeMultiRouletteResult,
-} from "vx-verifier";
+import { CommitmentContext, computeMultiRouletteResult } from "vx-verifier";
 
 import { assert } from "tsafe";
 import { MultiRoulette_Outcome } from "vx-verifier/dist/generated/message-contexts/multi-roulette";
@@ -82,6 +77,7 @@ async function main() {
         { uname: "RedMaster", amount: { value: 23, currency: Currency.BTC } },
         { uname: "BloodBath", amount: { value: 13, currency: Currency.BTC } },
       ],
+      name: "red",
     };
     const green: MultiRoulette_Outcome = {
       probability: 0.495,
@@ -90,6 +86,7 @@ async function main() {
         // all the players betting blue should be here
         { uname: "BlueDevil", amount: { value: 1, currency: Currency.TBTC } },
       ],
+      name: "green",
     };
     const bonus: MultiRoulette_Outcome = {
       probability: 0.01,
@@ -101,6 +98,7 @@ async function main() {
           amount: { value: 14, currency: Currency.ETH },
         },
       ],
+      name: "bonus",
     };
 
     const wager = {

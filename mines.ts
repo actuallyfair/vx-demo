@@ -6,12 +6,11 @@ import * as vx from "./vx";
 
 import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
-import { CommitmentContext, MessageContext, RevealContext } from "verifier";
+import { CommitmentContext, MessageContext, RevealContext } from "vx-verifier";
 import { assert } from "tsafe";
-import { bytesToNumberBE } from "@noble/curves/abstract/utils";
-import { Currency } from "verifier/dist/generated/currency";
+import { Currency } from "vx-verifier/dist/generated/currency";
 
-import { computeMineLocations } from "verifier/dist/compute-wager";
+import { computeMineLocations } from "vx-verifier/dist/compute-wager";
 
 async function main() {
   console.log("Running vx demo... (mines)");

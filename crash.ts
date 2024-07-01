@@ -12,7 +12,7 @@ import {
   CommitmentContext,
   MessageContext,
   computeCrashResult,
-} from "verifier";
+} from "vx-verifier";
 
 import { assert } from "tsafe";
 
