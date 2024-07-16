@@ -60,19 +60,13 @@ async function main() {
   let hash = commitment;
   assert(hash !== undefined);
 
-<<<<<<< HEAD
-  while (true) {
+  while (hashChain.length >= 1) {
+    gameId++;
+
     // Now let's get the next hash for our game
     const h = hashChain.pop();
-    if (h == undefined) {
-      break; // we've run out of things from the hash chain
-    }
+    assert(h !== undefined); // Hack to make TS happy
     hash = h;
-
-=======
-  while (hashChain.length >= 1) {
->>>>>>> parent of 15b7eed (We should pop from the hash chain before the loop, not after)
-    gameId++;
 
     const red: MultiRoulette_Outcome = {
       probability: 0.495,
@@ -139,11 +133,6 @@ async function main() {
       throw new Error("unknown roulette outcome?!");
     }
     console.log(`Game id ${gameId} = ${outcomeName}`);
-
-    // Now let's get the next hash for our game
-    const h = hashChain.pop();
-    assert(h !== undefined); // Hack to make TS happy
-    hash = h;
   }
 
   // There's really no point revealing, but after all done we can... (Todo:...)
